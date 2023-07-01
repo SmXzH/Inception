@@ -1,0 +1,36 @@
+version: "3.9"
+
+services:
+  nginx:
+    build:
+      dockerfile: requirements/nginx/Dockerfile
+    container_name: nginx
+    #    depends_on:
+    #      - wordpress
+    ports:
+      - "443:443"
+    restart: always
+
+
+  wordpress:
+    container_name: wordpress
+    build:
+      dockerfile: requirements/wordpress/Dockerfile
+    ports:
+      - "9000:9000"
+    # depends_on:
+    #   - nginx
+
+  # mariadb:
+  #   build:
+  #     context: .
+  #     dockerfile: requirements/mariadb/Dockerfile
+  #     args:
+  #       DB_NAME: ${DB_NAME}
+  #       DB_USER: ${DB_USER}
+  #       DB_PASS: ${DB_PASS}
+  #       DB_ROOT: ${DB_ROOT_PASS}
+  #   container_name: mariadb
+  #   ports:
+  #     - "3306:3306"
+  #   restart: always
