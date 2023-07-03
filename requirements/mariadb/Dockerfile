@@ -1,27 +1,35 @@
-FROM debian:latest
+#FROM debian:latest
 
-ARG DB_NAME \
-    DB_USER \
-    DB_PASS \
-    DB_ROOT_PASS
+## Установка MariaDB
+#RUN apt-get update && apt-get install -y mariadb-server
 
-RUN apt-get update && apt-get install -y mariadb-client && apt-get install -y mariadb
+## Копирование конфигурационного файла
+#COPY ./conf/my.cnf /etc/mysql/my.cnf
 
-RUN mkdir /var/run/mysqld; \
-    chmod 777 /var/run/mysqld; \
-    { echo '[mysqld]'; \
-      echo 'skip-host-cache'; \
-      echo 'skip-name-resolve'; \
-      echo 'bind-address=0.0.0.0'; \
-    } | tee  /etc/my.cnf.d/docker.cnf; \
-    sed -i "s|skip-networking|skip-networking=0|g" \
-      /etc/my.cnf.d/mariadb-server.cnf
+## Запуск службы MariaDB
+#CMD /etc/init.d/mysql start && bash
 
-RUN mysql_install_db --user=mysql --datadir=/var/lib/mysql
+FROM debian:buster
 
+USER root
+
+# Install MariaDB and other dependencies
+RUN apt-get update && apt-get -y upgrade && apt-get install -y mariadb-server && apt-get install -y mariadb-client
+
+# Configure MariaDB
+RUN chmod 755 /var/lib/mysql/mysql
+
+COPY ./conf/my.cnf /etc/mysql/my.cnf
+
+## Create a new MySQL user and database
+RUN service mysql start
+
+RUN mysql -e "CREATE DATABASE mydatabase;"
+RUN mysql -e "GRANT ALL PRIVILEGES ON mydatabase.* TO 'myuser'@'%' IDENTIFIED BY 'mypassword';" \
+RUN mysql -e "FLUSH PRIVILEGES;"
+
+# Expose the MariaDB port
 EXPOSE 3306
 
-USER mysql
-COPY tools/db.sh .
-ENTRYPOINT  ["sh", "db.sh"]
-CMD ["/usr/bin/mysqld", "--skip-log-error"]
+# Start MariaDB on container startup
+CMD ["tail", "-f"]
