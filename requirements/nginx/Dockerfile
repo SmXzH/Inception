@@ -15,7 +15,6 @@ COPY --chown=www-data:www-data ./requirements/nginx/conf/nginx.conf /etc/nginx/s
 
 RUN chmod 755 /var/www/html && ln -s /etc/nginx/sites-available/*.conf /etc/nginx/sites-enabled/
 
-COPY --chown=root:root ./requirements/nginx/tools/index.php var/www/html/
 # Открывает порт для HTTPS
 EXPOSE 443
 

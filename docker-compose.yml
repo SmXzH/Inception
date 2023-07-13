@@ -5,24 +5,57 @@ services:
     build:
       dockerfile: requirements/nginx/Dockerfile
     container_name: nginx
-    #    depends_on:
-    #      - wordpress
     ports:
       - "443:443"
     restart: always
-
-
+    depends_on:
+      - wordpress
+    networks:
+      - app
   wordpress:
     container_name: wordpress
     build:
-      dockerfile: requirements/wordpress/Dockerfile
-  #  ports:
-  #    - "9000:9000"
+      context: requirements/wordpress
+    env_file:
+      - ./.env
+    environment:
+      - WP_ADMIN_EMAIL=szhakypo@student.42abudhabi.ae
+      - WP_ADMIN_USER=szhakypo
+      - WP_ADMIN_PASS=test123
+      - WP_URL=szhakypo.42.fr
+      - WP_USER=szhakypouser
+      - WP_EMAIL=test123@gmail.com
+      - WP_PASS=test123
+      - WP_URL=localhost
+      - WP_TITLE=test
+    # volumes:
+    #   - wordpress_vol:/var/www/html/wordpress
+    depends_on:
+      mariadb:
+        condition: service_started
+    networks:
+      - app
+    expose:
+      - 9000:9000
+  mariadb:
+    container_name: mariadb
+    build: ./requirements/mariadb/.
+    # args:
+    #   - DB_NAME=wordpress
+    #   - DB_USER=szhakypo
+    # dockerfile: requirements/mariadb/Dockerfile
+    # volumes:
+    #   - mariadb_vol:/var/lib/mysql
+    env_file:
+      - ./.env
+    networks:
+      - app
+    expose:
+      - 3306:3306
 
-  #mariadb:
-  #   build:
-  #     dockerfile: requirements/mariadb/Dockerfile
-  #   container_name: mariadb
-  #   ports:
-  #     - "3306:3306"
-  #   restart: always
+volumes:
+  mariadb_vol:
+  wordpress_vol:
+
+networks:
+  app:
