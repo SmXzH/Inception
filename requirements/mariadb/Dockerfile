@@ -1,10 +1,5 @@
 FROM debian:buster
 
-ENV DB_NAME=wordpress \
-    DB_USER=szhakypo \
-    DB_PASS=hello123 \
-    DB_ROOT_PASS=hello123
-
 # Install MariaDB and other dependencies
 RUN apt-get update && apt-get -y upgrade && apt-get install -y mariadb-server && apt-get install -y mariadb-client
 
