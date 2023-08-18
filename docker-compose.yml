@@ -3,60 +3,65 @@ version: "3.9"
 services:
   nginx:
     build:
-      dockerfile: requirements/nginx/Dockerfile
+      context: requirements/nginx/
     container_name: nginx
     ports:
       - "443:443"
-    restart: always
+    image: nginx:42
+    restart: on-failure
     depends_on:
       - wordpress
-    networks:
-      - app
+    # networks:
+    #   - app
   wordpress:
     container_name: wordpress
     build:
       context: requirements/wordpress
+      args:
+        DB_NAME: ${DB_NAME}
+        DB_USER: ${DB_USER}
+        DB_PASS: ${DB_PASS}
+        DB_ROOT_PASS: ${DB_ROOT_PASS}
+        WP_ADMIN_EMAIL: ${WP_ADMIN_EMAIL}
+        WP_ADMIN_USER: ${WP_ADMIN_USER}
+        WP_ADMIN_PASS: ${WP_ADMIN_PASS}
+        WP_URL: ${WP_URL}
+        WP_USER: ${WP_USER}
+        WP_EMAIL: ${WP_EMAIL}
+        WP_PASS: ${WP_PASS}
     env_file:
       - ./.env
-    environment:
-      - WP_ADMIN_EMAIL=szhakypo@student.42abudhabi.ae
-      - WP_ADMIN_USER=szhakypo
-      - WP_ADMIN_PASS=test123
-      - WP_URL=szhakypo.42.fr
-      - WP_USER=szhakypouser
-      - WP_EMAIL=test123@gmail.com
-      - WP_PASS=test123
-      - WP_URL=localhost
-      - WP_TITLE=test
     # volumes:
     #   - wordpress_vol:/var/www/html/wordpress
     depends_on:
       mariadb:
         condition: service_started
-    networks:
-      - app
-    expose:
-      - 9000:9000
+    # networks:
+    #   - app
+    # expose:
+    #   - 9000:9000
   mariadb:
+    build:
+      context: ./requirements/mariadb/.
+      args: 
+        DB_NAME: ${DB_NAME}
+        DB_USER: ${DB_USER}
+        DB_PASS: ${DB_PASS}
+        DB_ROOT_PASS: ${DB_ROOT_PASS}
     container_name: mariadb
-    build: ./requirements/mariadb/.
-    # volumes:
-    #   - mariadb_vol:/var/lib/mysql
-    environment:
-      - DB_NAME=wordpress
-      - DB_USER=szhakypo
-      - DB_PASS=hello123
-      - DB_ROOT_PASS=hello123
     env_file:
       - ./.env
-    networks:
-      - app
-    expose:
-      - 3306:3306
+    # volumes:
+    #   - mariadb_vol:/var/lib/mysql
+    
+    # networks:
+    #   - app
+    # expose:
+    #   - 3306:3306
 
-volumes:
-  mariadb_vol:
-  wordpress_vol:
+# volumes:
+#   mariadb_vol:
+#   wordpress_vol:
 
-networks:
-  app:
+# networks:
+#   app:
