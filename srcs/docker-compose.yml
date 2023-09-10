@@ -10,9 +10,12 @@ services:
     image: nginx:42
     restart: on-failure
     depends_on:
-      - wordpress
-    # networks:
-    #   - app
+      wordpress:
+        condition: service_started
+    networks:
+      - app
+    volumes:
+      - wordpress_vol:/var/www/html/wordpress
   wordpress:
     container_name: wordpress
     build:
@@ -31,15 +34,13 @@ services:
         WP_PASS: ${WP_PASS}
     env_file:
       - ./.env
-    # volumes:
-    #   - wordpress_vol:/var/www/html/wordpress
+    networks:
+      - app
     depends_on:
       mariadb:
         condition: service_started
-    # networks:
-    #   - app
-    # expose:
-    #   - 9000:9000
+    volumes:
+      - wordpress_vol:/var/www/html/wordpress
   mariadb:
     build:
       context: ./requirements/mariadb/.
@@ -51,17 +52,16 @@ services:
     container_name: mariadb
     env_file:
       - ./.env
-    # volumes:
-    #   - mariadb_vol:/var/lib/mysql
+    networks:
+      - app
+    volumes:
+      - mariadb_vol:/var/lib/mysql
     
-    # networks:
-    #   - app
-    # expose:
-    #   - 3306:3306
 
-# volumes:
-#   mariadb_vol:
-#   wordpress_vol:
+volumes:
+  mariadb_vol:
+  wordpress_vol:
 
-# networks:
-#   app:
+networks:
+  app:
+    driver: bridge
