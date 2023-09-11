@@ -2,7 +2,9 @@ FROM debian:bullseye
 
 ARG DB_NAME
 ARG DB_USER
-ARG DB_PASSDB_ROOT_PASS
+ARG DB_PASS
+ARG DB_ROOT_PASS
+ARG DB_HOSTNAME
 ARG WP_ADMIN_EMAIL
 ARG WP_ADMIN_USER
 ARG WP_ADMIN_PASS
@@ -14,8 +16,9 @@ ARG WP_PASS
 USER root
 
 RUN apt-get update && apt-get install -y \
-    php7.3-fpm \
-    php7.3-mysql \
+    apt-utils \
+    php7.4-fpm \
+    php7.4-mysql \
     wget \
     curl \
     ca-certificates \
@@ -30,7 +33,7 @@ RUN curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli
 RUN mkdir -p /var/run/php \
     && mkdir -p /usr/local/var/run/
 
-COPY ./conf/php-fpm.conf /etc/php/7.3/fpm/php-fpm.conf
+COPY ./conf/php-fpm.conf /etc/php/7.4/fpm/php-fpm.conf
 
 COPY ./tools/wp-config.php /var/www/html/wordpress/wp-config.php
 

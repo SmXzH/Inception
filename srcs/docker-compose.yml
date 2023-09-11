@@ -4,11 +4,16 @@ services:
   nginx:
     build:
       context: requirements/nginx/
+      args:
+        CERT_PATH: ${CERT_PATH}
+        KEY_PATH: ${KEY_PATH}
     container_name: nginx
+    image: nginx:42
     ports:
       - "443:443"
-    image: nginx:42
     restart: on-failure
+    env_file:
+      - ./.env
     depends_on:
       wordpress:
         condition: service_started
@@ -18,6 +23,7 @@ services:
       - wordpress_vol:/var/www/html/wordpress
   wordpress:
     container_name: wordpress
+    image: wordpress:42
     build:
       context: requirements/wordpress
       args:
@@ -25,6 +31,7 @@ services:
         DB_USER: ${DB_USER}
         DB_PASS: ${DB_PASS}
         DB_ROOT_PASS: ${DB_ROOT_PASS}
+        DB_HOSTNAME: ${DB_HOSTNAME}
         WP_ADMIN_EMAIL: ${WP_ADMIN_EMAIL}
         WP_ADMIN_USER: ${WP_ADMIN_USER}
         WP_ADMIN_PASS: ${WP_ADMIN_PASS}
@@ -42,14 +49,15 @@ services:
     volumes:
       - wordpress_vol:/var/www/html/wordpress
   mariadb:
+    container_name: mariadb
+    image: mariadb:42
     build:
-      context: ./requirements/mariadb/.
+      context: requirements/mariadb
       args: 
         DB_NAME: ${DB_NAME}
         DB_USER: ${DB_USER}
         DB_PASS: ${DB_PASS}
         DB_ROOT_PASS: ${DB_ROOT_PASS}
-    container_name: mariadb
     env_file:
       - ./.env
     networks:
@@ -60,8 +68,19 @@ services:
 
 volumes:
   mariadb_vol:
+    name: mariadb
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: '/home/szhakypo/data/mariadb'
   wordpress_vol:
-
+    name: wordpress
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: '/home/szhakypo/data/wordpress'
 networks:
   app:
     driver: bridge

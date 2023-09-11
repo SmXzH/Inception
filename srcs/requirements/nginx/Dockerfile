@@ -1,10 +1,13 @@
 FROM debian:bullseye
 
-RUN apt-get update && apt-get install -y openssl && apt-get install -y nginx
+ARG CERT_PATH
+ARG KEY_PATH
+
+RUN apt-get update && apt-get install -y openssl && apt-get install -y nginx && apt-get install apt-utils
 
 RUN mkdir /etc/nginx/certificates
 
-RUN openssl req -x509 -newkey rsa:2048 -nodes -keyout /etc/nginx/certificates/key.key -out /etc/nginx/certificates/cert.crt -subj "/CN=szhakypo.42.fr" -days 365
+RUN openssl req -x509 -newkey rsa:2048 -nodes -keyout ${KEY_PATH} -out ${CERT_PATH} -subj "/CN=szhakypo.42.fr" -days 365
 
 COPY --chown=www-data:www-data ./conf/nginx.conf /etc/nginx/sites-available/nginx.conf
 
