@@ -1,17 +1,17 @@
-DIR = /home/${USER}
+DIR = /home/szhakypo
 
 all: inception
 
 inception:
-	mkdir -p ${DIR}/data/mariadb
-	mkdir -p ${DIR}/data/wordpress
+	mkdir -p /home/szhakypo/data/mariadb
+	mkdir -p /home/szhakypo/data/wordpress
 	docker-compose -f ./srcs/docker-compose.yml up --build -d
 
 clean:
 	docker-compose -f ./srcs/docker-compose.yml down --rmi all -v --remove-orphans 2>/dev/null || true
 
 fclean: clean
-	rm -rf ${DIR}/data/*
+	sudo rm -rf /home/szhakypo/data/*
 	docker rmi -f $$(docker images -a -q) 2> /dev/null || true
 	docker volume prune -f
 

@@ -16,5 +16,4 @@ RUN chmod 755 /var/www/html && ln -s /etc/nginx/sites-available/*.conf /etc/ngin
 EXPOSE 443
 
 CMD ["nginx", "-g", "daemon off;"]
-# CMD ["tail", "-f"]
 
